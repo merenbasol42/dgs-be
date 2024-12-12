@@ -121,4 +121,6 @@ GET /api/earthquakes?country=Türkiye&minMagnitude=5.0
 - Tüm tarih ve koordinat bilgileri standart formatlarda işlenir
 
 ## Lisans
-[Lisans bilgisi eklenecek]
+Bu proje MIT Lisansı altında yayınlanmaktadır. Detaylı bilgi için LICENSE dosyasına bakınız. 
+
+MIT Lisansı, yazılımın serbestçe kullanılmasına, değiştirilmesine, dağıtılmasına ve paylaşılmasına izin verir. Tek gereklilik, lisans ve telif hakkı bildiriminin orijinal yazılımla birlikte korunmasıdır.
