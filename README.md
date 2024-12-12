@@ -39,17 +39,78 @@ npm run build
 npm start
 ```
 
-## API Endpoint'leri
-- `GET /health`: Sunucu sağlık kontrolü
-- `GET /api/earthquakes`: Tüm depremleri listele
-- `POST /api/earthquakes`: Yeni deprem kaydı oluştur
-- `GET /api/earthquakes/statistics`: Deprem istatistiklerini getir
-- `GET /api/earthquakes/:id`: Belirli bir depremi getir
-- `PUT /api/earthquakes/:id`: Deprem kaydını güncelle
-- `DELETE /api/earthquakes/:id`: Deprem kaydını sil
+## API Endpoint'leri ve Veri Formatları
 
-## Filtreleme
-Deprem listesini ülkeye ve minimum büyüklüğe göre filtreleyebilirsiniz:
+### Genel Deprem Endpoint'leri
+
+#### 1. Tüm Depremleri Listeleme
+- **Endpoint**: `GET /api/earthquakes`
+- **Açıklama**: Tüm depremlerin listesini getirir
+- **Parametreler**:
+  - `country` (isteğe bağlı): Ülkeye göre filtreleme
+  - `minMagnitude` (isteğe bağlı): Minimum büyüklük filtresi
+- **Yanıt Formatı**:
+```typescript
+{
+  country: string;
+  city: string;
+  date: Date;
+  magnitude: number;
+  depth: number;
+  epicenter: {
+    type: 'Point';
+    coordinates: [number, number]; // [longitude, latitude]
+  }
+}
+```
+
+#### 2. Yeni Deprem Kaydı Oluşturma
+- **Endpoint**: `POST /api/earthquakes`
+- **Açıklama**: Yeni bir deprem kaydı oluşturur
+- **İstek Gövdesi**:
+```typescript
+{
+  country: string;
+  city: string;
+  date: Date;
+  magnitude: number;
+  depth: number;
+  epicenter: {
+    coordinates: [number, number]; // [longitude, latitude]
+  }
+}
+```
+
+#### 3. Belirli Bir Depremi Getirme
+- **Endpoint**: `GET /api/earthquakes/:id`
+- **Açıklama**: Belirli bir depremi ID'sine göre getirir
+- **Yanıt Formatı**: Yukarıdaki deprem nesnesi formatında
+
+#### 4. Deprem Kaydını Güncelleme
+- **Endpoint**: `PUT /api/earthquakes/:id`
+- **Açıklama**: Var olan bir deprem kaydını günceller
+- **İstek Gövdesi**: Deprem nesnesi formatında güncellenecek alanlar
+
+#### 5. Deprem Kaydını Silme
+- **Endpoint**: `DELETE /api/earthquakes/:id`
+- **Açıklama**: Belirli bir deprem kaydını siler
+
+### İstatistiksel Endpoint
+
+#### Deprem İstatistikleri
+- **Endpoint**: `GET /api/earthquakes/statistics`
+- **Açıklama**: Depremler hakkında istatistiksel bilgiler sağlar
+- **Olası Yanıt İçeriği**:
+  - Toplam deprem sayısı
+  - Ortalama büyüklük
+  - Ülkelere göre deprem dağılımı
+  - Büyüklük aralıklarına göre deprem sayısı
+
+### Sağlık Kontrolü
+- **Endpoint**: `GET /health`
+- **Açıklama**: Sunucunun çalışma durumunu kontrol eder
+
+## Filtreleme Örnekleri
 ```
 GET /api/earthquakes?country=Türkiye&minMagnitude=5.0
 ```
@@ -57,3 +118,7 @@ GET /api/earthquakes?country=Türkiye&minMagnitude=5.0
 ## Geliştirme Notları
 - Proje MongoDB kullanmaktadır
 - Gerçek bir üretim ortamında güvenlik ayarlarını ve CORS politikalarını gözden geçirin
+- Tüm tarih ve koordinat bilgileri standart formatlarda işlenir
+
+## Lisans
+[Lisans bilgisi eklenecek]
