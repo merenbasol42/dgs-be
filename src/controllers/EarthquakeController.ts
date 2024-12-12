@@ -5,11 +5,28 @@ export class EarthquakeController {
   // Tüm depremleri getir
   static async getAllEarthquakes(req: Request, res: Response): Promise<void> {
     try {
-      const { country, minMagnitude } = req.query;
+      const { country, minMagnitude, lat, lng, radius } = req.query;
       
       let query: any = {};
       if (country) query.country = country;
       if (minMagnitude) query.magnitude = { $gte: parseFloat(minMagnitude as string) };
+
+      // Konuma göre deprem sorgusu
+      if (lat && lng && radius) {
+        const parsedLat = parseFloat(lat as string);
+        const parsedLng = parseFloat(lng as string);
+        const parsedRadius = parseFloat(radius as string);
+
+        query['epicenter'] = {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [parsedLng, parsedLat]
+            },
+            $maxDistance: parsedRadius // metre cinsinden yarıçap
+          }
+        };
+      }
 
       const earthquakes = await Earthquake.find(query).sort({ date: -1 });
       res.status(200).json(earthquakes);
@@ -32,13 +49,22 @@ export class EarthquakeController {
         return;
       }
 
+      // Epicenter'ın doğru formatta olup olmadığını kontrol et
+      if (!epicenter.type || !epicenter.coordinates || epicenter.type !== 'Point') {
+        res.status(400).json({ message: 'Epicenter formatı yanlış' });
+        return;
+      }
+
       const newEarthquake = new Earthquake({
         country,
         city,
         date,
         magnitude,
         depth,
-        epicenter
+        epicenter: {
+          type: 'Point',
+          coordinates: epicenter.coordinates
+        }
       });
 
       const savedEarthquake = await newEarthquake.save();
@@ -51,7 +77,7 @@ export class EarthquakeController {
     }
   }
 
-  // Belirli bir depremi getir
+  // Diğer metodlar aynı kalacak (önceki versiyondaki gibi)
   static async getEarthquakeById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;

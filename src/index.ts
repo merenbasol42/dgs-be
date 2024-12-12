@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import earthquakeRoutes from './routes/earthquakeRoutes';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { apiLimiter } from './middleware/rateLimitMiddleware';
 
 // Ortam değişkenlerini yükle
 dotenv.config();
@@ -18,6 +20,9 @@ mongoose.connect(MONGODB_URI)
 // Middleware'ler
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting
+app.use(apiLimiter);
 
 // CORS ayarları
 app.use((req, res, next) => {
@@ -40,13 +45,9 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
-// Tanımsız route için 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    status: 'Error',
-    message: 'Endpoint bulunamadı'
-  });
-});
+// Hata yakalama middleware'leri
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Sunucuyu başlat
 const server = app.listen(PORT, () => {

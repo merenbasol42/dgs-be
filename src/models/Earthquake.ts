@@ -8,8 +8,8 @@ export interface IEarthquake extends Document {
   magnitude: number;
   depth: number;
   epicenter: {
-    lat: number;
-    lng: number;
+    type: string;
+    coordinates: number[];
   };
 }
 
@@ -21,8 +21,17 @@ const earthquakeSchema: Schema = new Schema({
   magnitude: { type: Number, required: true },
   depth: { type: Number, required: true },
   epicenter: {
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+      index: '2dsphere'
+    }
   }
 }, { 
   timestamps: true 
